@@ -12,11 +12,13 @@
 	</head>
 
 	<body class="h-full">
+		{% include 'partials/navbar.html'%}
 	
         <div>
             {% block content%}
             {% endblock %}
         </div>
+		{% include 'partials/_footer.html'%}
 		<script src="{% static 'js/style.js' %}"></script>
 	</body>
 </html>
