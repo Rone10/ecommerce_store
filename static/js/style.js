@@ -3,8 +3,8 @@ const hamburger = document.getElementById('hamburger')
 const menu_btn = document.getElementById('menu-btn')
 const mobile_menu = document.getElementById('mobile-menu')
 const mob_items = document.querySelectorAll('.mob-item')
-
-
+const displayImg = document.getElementById('display-image')
+const mainTab = document.querySelectorAll('.main-tab')
 // btn_x.addEventListener('click', navToggle)
 // menu_btn.addEventListener('click', navToggle)
 
@@ -33,4 +33,18 @@ function hamburger_close(){
 
 mob_items.forEach(item => {
     item.addEventListener('click', hamburger_close)
+})
+mainTab.forEach(item => {
+    item.addEventListener('click', function(){
+        imgSrc = item.getAttribute('src')
+        displayImg.setAttribute('src', imgSrc)
+        console.log('he clicked me')
+    })
+})
+mainTab.forEach(item => {
+    item.addEventListener('mouseover', function(){
+        imgSrc = item.getAttribute('src')
+        displayImg.setAttribute('src', imgSrc)
+        console.log('he clicked me')
+    })
 })
