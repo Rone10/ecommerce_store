@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView, DetailView, ListView, TemplateView
 from django.views import View
-from .models import Product
+from .models import Product, Order, OrderItem
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 
@@ -13,12 +13,40 @@ class ProductDetailView(DetailView):
     model = Product
     context_object_name = "product"
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     prod = Product.objects.get(name="Air Jordan")
-    #     context["product"] = prod
-    #     # context["image"] = prod.product_image[0]
-    #     return context
+    # def get_queryset(self):
+    #     super().get_queryset()
+    #     product = Product.objects.filter(pk=self.kwargs["pk"])
+    #     return product
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product_id = self.kwargs["pk"]
+        print(f"product_id: {self.object.id}")
+        product = Product.objects.get(pk=product_id)
+        recently_viewed_products = None
+        print(f"pr {self.object}")
+
+        if "recently_viewed" in self.request.session:
+            if product_id in self.request.session["recently_viewed"]:
+                self.request.session["recently_viewed"].remove(
+                    product_id
+                )  # later for removing item from cart
+
+            products = Product.objects.filter(
+                pk__in=self.request.session["recently_viewed"]
+            )
+            recently_viewed_products = sorted(
+                products,
+                key=lambda x: self.request.session["recently_viewed"].index(x.id),
+            )
+            self.request.session["recently_viewed"].insert(0, product_id)
+            if len(self.request.session["recently_viewed"]) > 4:
+                self.request.session["recently_viewed"].pop()
+        else:
+            self.request.session["recently_viewed"] = [product_id]
+        self.request.session.modified = True
+        context["recently_viewed_products"] = recently_viewed_products
+        return context
 
 
 class ProductListView(ListView):
@@ -46,12 +74,40 @@ class ProductListView(ListView):
 
 
 class AddToCartView(View):
+    """
+    if user is not logged in, item will be added to cart session using product_id.
+    Once user logs in, items in session cart will be transferred to logged in user cart and
+    session cart emptied.
+
+    session cart should persist even after browser closure.
+
+    """
+
     def get(self, request, *args, **kwargs):
-        product_id = kwargs["product_id"]
+        product_id = self.kwargs["pk"]
         product = Product.objects.get(pk=product_id)
         recently_viewed_products = None
 
-        if "recently_added" in request.session:
+        if self.request.user.is_authenticated:
+            print("inside if user authenticated")
+            # old_item = OrderItem.objects.get(
+            #     customer=self.request.user, product=product
+            # ) # this raises a DoesNotExit error if the object is not found and that causes
+            old_item = OrderItem.objects.filter(
+                customer=self.request.user, product=product
+            ).first()
+            print("***** .before if old_items:")
+            if old_item:
+                old_item.quantity += 1
+                old_item.save()
+            else:
+                print("_-_-_ inside else: for new_items:")
+                new_item = OrderItem.objects.create(
+                    customer=self.request.user, product=product
+                )
+                new_item.save()
+
+        elif "recently_added" in self.request.session:
             # if product_id in request.session["recently_added"]:
             #     request.session["recently_viewed"].remove(product_id) # later for removing item from cart
 
@@ -59,14 +115,14 @@ class AddToCartView(View):
             # recently_viewed_products = sorted(
             #     products, key=lambda x: request.session["recently_added"].index(x.id)
             # )
-            request.session["recently_added"].insert(0, product_id)
+            self.request.session["recently_added"].insert(0, product_id)
             # if len(request.session["recently_viewed"]) > 5:
             #     request.session["recently_viewed"].pop()
         else:
-            request.session["recently_added"] = [product_id]
+            self.request.session["recently_added"] = [product_id]
             # return HttpResponseRedirect(reverse_lazy("products:cart"))
 
-        request.session.modified = True
+        self.request.session.modified = True
 
         # context = {
         #     "product": product,
@@ -77,27 +133,147 @@ class AddToCartView(View):
 
 
 class CartView(TemplateView):
+    """
+    if user is logged in, show user cart otherwise grab session cart
+    """
+
     template_name = "store/cart.html"
+    # def get(self, request, *args, **kwargs):
+    #     # product_id = self.kwargs["pk"]
+    #     # product = Product.objects.get(pk=product_id)
+    #     # recently_viewed_products = None
+    #     print(f"request.sessions: {self.request.session['recently_added']}:")
+    #     if self.request.user.is_authenticated:
+    #         print("CartView.get()")
+    # old_item = OrderItem.objects.filter(
+    #     customer=self.request.user, product=product
+    # ).first()
+    # if old_item:
+    #     old_item.quantity += 1
+    #     old_item.save()
+    # else:
+    #     new_item = OrderItem.objects.create(
+    #         customer=self.request.user, product=product
+    #     )
+    #     new_item.save()
+
+    #     for id in self.request.session["recently_added"]:
+    #         print("CartView.get().if")
+    #         prod = Product.objects.get(pk=id)
+    #         if OrderItem.objects.filter(
+    #             customer=self.request.user, product=prod
+    #         ).first():
+    #             self.request.session["recently_added"].remove(id)
+    #         else:
+    #             OrderItem.objects.create(customer=self.request.user, product=prod)
+    #         request.session.modified = True
+    # # elif "recently_added" in self.request.session:
+
+    # #     self.request.session["recently_added"].insert(0, product_id)
+    # # else:
+    # # self.request.session["recently_added"] = [product_id]
+    # print("outside for loop")
+    # return render(self.request, "store/cart.html")
+
+    # request.session.modified = True
+    # return HttpResponseRedirect(reverse_lazy("products:cart_view"))
 
     def get_context_data(self, **kwargs):
+        print("inside get_context_data")
         context = super().get_context_data(**kwargs)
         products = None
         recently_added_products = None
+        if self.request.user.is_authenticated:
+            context["user_cart"] = OrderItem.objects.filter(customer=self.request.user)
+            if "recently_added" in self.request.session:
+                print(f" self.request.session {self.request.session['recently_added']}")
+                if self.request.session["recently_added"]:
+                    for id in self.request.session["recently_added"]:
+                        print("for id in self.request.session['recently_added']:")
+                        prod = Product.objects.get(pk=id)
+                        if OrderItem.objects.filter(
+                            customer=self.request.user, product=prod
+                        ).first():
+                            self.request.session["recently_added"].remove(id)
+                        else:
+                            OrderItem.objects.create(
+                                customer=self.request.user, product=prod
+                            )
+                        print('about to delete "recently_added"')
+                print(
+                    f"before del request.session {self.request.session['recently_added']}"
+                )
+                del self.request.session["recently_added"]
+                # print(
+                #     f"after del request.session {[sess for sess in self.request.session]}"
+                # )
+                self.request.session.modified = True
         if "recently_added" in self.request.session:
+            print("if recently_added:  ")
             products = Product.objects.filter(
                 pk__in=self.request.session["recently_added"]
             )
         else:
+            print('adding self.request.session["recently_added"]')
             self.request.session["recently_added"] = []
-            return context
+            # return context
         if products:
             recently_added_products = sorted(
                 products,
                 key=lambda x: self.request.session["recently_added"].index(x.id),
             )
         # request.session["recently_viewed"].insert(0, product_id)
+
         context["products"] = recently_added_products
         return context
+
+
+# class CartView(ListView):
+#     """
+#     if user is logged in, show user cart otherwise grab session cart
+#     """
+
+#     model = OrderItem
+#     template_name = "store/cart.html"
+#     context_object_name = "user_cart"
+
+#     def get_queryset(self):
+#         queryset = super().get_queryset()
+#         res = OrderItem.objects.filter(customer=self.request.user)
+#         return res
+
+# def get_context_data(self, **kwargs):
+#     context = super().get_context_data(**kwargs)
+#     products = None
+#     recently_added_products = None
+#     if "recently_added" in self.request.session:
+#         products = Product.objects.filter(
+#             pk__in=self.request.session["recently_added"]
+#         )
+#     else:
+#         self.request.session["recently_added"] = []
+#         return context
+#     if products:
+#         recently_added_products = sorted(
+#             products,
+#             key=lambda x: self.request.session["recently_added"].index(x.id),
+#         )
+#     # request.session["recently_viewed"].insert(0, product_id)
+#     context["user_cart"] = OrderItem.objects.filter(customer=self.request.user)
+#     context["products"] = recently_added_products
+#     return context
+
+
+def CheckoutView(request):
+
+    return HttpResponseRedirect(reverse_lazy("products:list"))
+    # class CheckoutView:
+    """
+    once user clicks checkout:
+        1. log user in and redirect them to cart page
+        2. access the recently_viewed session:
+        3. iterate over its items and add them to your order model to create an order
+    """
 
 
 """
@@ -112,5 +288,6 @@ item from the Orders model.
 
 
 """
+
 # class ProductSearchListView(ListView):
 #     model = Product

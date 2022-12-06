@@ -38,3 +38,9 @@ class ImageAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     # model = CustomUser
     list_display = ("name",)
+
+
+# @admin.register(Order)
+# class CategoryAdmin(admin.ModelAdmin):
+#     # model = CustomUser
+#     list_display = ("name",)

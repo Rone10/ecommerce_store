@@ -133,7 +133,7 @@
   
             <div class="sm:flex-col1 mt-10 flex">
          
-              <a href="{% url 'products:cart' product_id=product.id %}" type="submit" class="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full">Add to bag</a>
+              <a href="{% url 'products:add_to_cart' pk=product.id %}" class="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full">Add to bag</a>
   
               <button type="button" class="ml-4 flex items-center justify-center rounded-md py-3 px-3 text-gray-400 hover:bg-gray-100 hover:text-gray-500">
                 <!-- Heroicon name: outline/heart -->
@@ -201,4 +201,63 @@
       </div>
     </div>
   </div>
+
+
+
+<div class="bg-white">
+  <div class="py-16 sm:py-24 lg:mx-auto lg:max-w-7xl lg:px-8">
+    <div class="flex items-center justify-between px-4 sm:px-6 lg:px-0">
+      <h2 class="text-2xl font-bold tracking-tight text-gray-900">Recently Viewed </h2>
+      <a href="#" class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block">
+        See everything
+        <span aria-hidden="true"> &rarr;</span>
+      </a>
+    </div>
+
+    <div class="relative mt-8">
+      <div class="relative -mb-6 w-full overflow-x-auto pb-6">
+        <ul role="list" class="mx-4 inline-flex space-x-8 sm:mx-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-x-8 lg:space-x-0">
+          {% for item in recently_viewed_products %}
+          <li class="inline-flex w-64 flex-col text-center lg:w-auto">
+            <a href="{% url 'products:detail' pk=item.id %}">
+            <div class="group relative">
+              <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200">
+                {% with item.product_image.all|first as image%}
+                <img id='display-image' src="{{ image.url.url }}" alt="{{ image.alt_text }}" class="h-full w-full object-cover object-center group-hover:opacity-75">
+                {% endwith %}
+                 
+              </div>
+              <div class="mt-6">       
+                  <h3 class="mt-1 font-semibold text-gray-900">
+                    <span class="absolute inset-0"></span>
+                    {{item.name}}
+                </h3>
+                <p class="mt-1 text-gray-900">${{item.price}}</p>
+              </div>
+            </div>
+            {% comment %} {% for name in item.attribute_name.all %}
+            <p>{{name}}</p>
+              {% for attr in name.attribute_value.all %}
+              <p>{{attr.value}}</p>
+            
+            {% endfor %}
+            {% endfor %} {% endcomment %}
+          </a>
+          </li>   
+          {% endfor %}
+          <!-- More products... -->
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 flex px-4 sm:hidden">
+      <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-500">
+        See everything
+        <span aria-hidden="true"> &rarr;</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+
   {% endblock %}
