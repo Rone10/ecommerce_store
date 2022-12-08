@@ -4,6 +4,7 @@ from django.views import View
 from .models import Product, Order, OrderItem
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.contrib import messages
 
 # Create your views here.
 
@@ -94,7 +95,7 @@ class AddToCartView(View):
             #     customer=self.request.user, product=product
             # ) # this raises a DoesNotExit error if the object is not found and that causes
             old_item = OrderItem.objects.filter(
-                customer=self.request.user, product=product
+                customer=self.request.user, product=product, is_placed=False
             ).first()
             print("***** .before if old_items:")
             if old_item:
@@ -129,6 +130,28 @@ class AddToCartView(View):
         #     "recently_viewed_products": recently_viewed_products,
         # }
         # return render(request, "store/cart.html", context)
+        message = "successfully added to cart"
+        messages.info(self.request, message)
+        return HttpResponseRedirect(reverse_lazy("products:cart_view"))
+
+
+class RemoveFromCartView(View):
+    def get(self, request, *args, **kwargs):
+        product_id = self.kwargs["pk"]
+        product = Product.objects.get(pk=product_id)
+        recently_viewed_products = None
+
+        if self.request.user.is_authenticated:
+            item = OrderItem.objects.filter(
+                customer=self.request.user, product=product
+            ).first()
+            if item:
+                item.delete()
+        elif "recently_added" in self.request.session:
+            self.request.session["recently_added"].remove(product_id)
+            self.request.session.modified = True
+        else:
+            return HttpResponseRedirect(reverse_lazy("products:list"))
         return HttpResponseRedirect(reverse_lazy("products:cart_view"))
 
 
@@ -184,7 +207,9 @@ class CartView(TemplateView):
         products = None
         recently_added_products = None
         if self.request.user.is_authenticated:
-            context["user_cart"] = OrderItem.objects.filter(customer=self.request.user)
+            context["user_cart"] = OrderItem.objects.filter(
+                customer=self.request.user, is_placed=False
+            )
             if "recently_added" in self.request.session:
                 print(f" self.request.session {self.request.session['recently_added']}")
                 if self.request.session["recently_added"]:
@@ -228,52 +253,64 @@ class CartView(TemplateView):
         return context
 
 
-# class CartView(ListView):
-#     """
-#     if user is logged in, show user cart otherwise grab session cart
-#     """
+# def CheckoutView(request):
 
-#     model = OrderItem
-#     template_name = "store/cart.html"
-#     context_object_name = "user_cart"
-
-#     def get_queryset(self):
-#         queryset = super().get_queryset()
-#         res = OrderItem.objects.filter(customer=self.request.user)
-#         return res
-
-# def get_context_data(self, **kwargs):
-#     context = super().get_context_data(**kwargs)
-#     products = None
-#     recently_added_products = None
-#     if "recently_added" in self.request.session:
-#         products = Product.objects.filter(
-#             pk__in=self.request.session["recently_added"]
-#         )
-#     else:
-#         self.request.session["recently_added"] = []
-#         return context
-#     if products:
-#         recently_added_products = sorted(
-#             products,
-#             key=lambda x: self.request.session["recently_added"].index(x.id),
-#         )
-#     # request.session["recently_viewed"].insert(0, product_id)
-#     context["user_cart"] = OrderItem.objects.filter(customer=self.request.user)
-#     context["products"] = recently_added_products
-#     return context
+#     return HttpResponseRedirect(reverse_lazy("products:list"))
 
 
-def CheckoutView(request):
+class OrdersListView(ListView):
+    template_name = "store/order_summary.html"
+    context_object_name = "orders"
 
-    return HttpResponseRedirect(reverse_lazy("products:list"))
-    # class CheckoutView:
+    def get_queryset(self):
+        # queryset = super().get_queryset()
+        return Order.objects.filter(customer=self.request.user).all()
+
+
+class CheckoutView(ListView):
     """
     once user clicks checkout:
         1. log user in and redirect them to cart page
         2. access the recently_viewed session:
         3. iterate over its items and add them to your order model to create an order
     """
+
+    template_name = "store/order_summary.html"
+    context_object_name = "orders"
+
+    def get(self, request, *args, **kwargs):
+        order = Order.objects.create(customer=self.request.user)
+        items = OrderItem.objects.filter(
+            customer=self.request.user, is_placed=False
+        ).all()
+        if items:
+            for item in items:
+                order.order_items.add(item)
+                item.is_placed = True
+                item.save()
+
+        order.save()
+        # return render(request, "store/order_summary.html")
+        # return super().get(request, *args, **kwargs)
+        message = "successfully placed order"
+        messages.info(self.request, message)
+        return HttpResponseRedirect(
+            reverse_lazy("products:order_detail", kwargs={"pk": order.id})
+        )
+
+    def get_queryset(self):
+        # queryset = super().get_queryset()
+        return Order.objects.filter(customer=self.request.user).all()
+
+
+class OrderDetailView(View):
+
+    # context_object_name = "order"
+
+    def get(self, request, *args, **kwargs):
+        order = Order.objects.get(pk=self.kwargs["pk"], customer=self.request.user)
+        context = {"order": order}
+        return render(request, "store/checkout_confirm.html", context)
 
 
 """
