@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+    <div class="bg-white">
+        <div class="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
+            <h1 class="text-center text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Shopping Cart</h1>
+            <section aria-labelledby="cart-heading">
+                <h2 id="cart-heading" class="sr-only">Items in your shopping cart</h2>
+                
+                <ul role="list" class="divide-y divide-gray-200 border-t border-b border-gray-200">
+                    
+                    {% if user_cart %}
+                    {% for product in user_cart %}
+                    <form class="mt-12">
+                        <li class="flex py-6">
+                            <form action="{% url 'products:list' %}" method="GET">
+                                <div class="flex-shrink-0">
+                                    {% with product.product.product_image.all|first as image%}
+                                    <img src="{{ image.url.url }}" alt="{{ image.alt_text }}" class="h-24 w-24 rounded-md object-cover object-center sm:h-32 sm:w-32">
+                                    {% endwith %}
+                                </div>
+                                
+                                <div class="ml-4 flex flex-1 flex-col sm:ml-6">
+                                    <div>
+                                        <div class="flex justify-between">
+                                            <h4 class="text-sm">
+                                                <a href="#" class="font-medium text-gray-700 hover:text-gray-800">{{product.product.name}}</a>
+                                            </h4>
+                                            <p class="ml-4 text-sm font-medium text-gray-900">${{product.product.price}}</p>
+                                        </div>
+                                        <!--attributes go here-->
+                                        {% comment %} <p class="mt-1 text-sm text-gray-500"><span class="font-bold">Qty {{product.quantity}}</span></p> {% endcomment %}
+                                        
+                                        
+                                    </div>
+                                    
+                                    <div class="mt-4 flex flex-1 items-end justify-between">
+                                        <p class="flex items-center space-x-2 text-sm text-gray-700">
+                                            <!-- Heroicon name: mini/check -->
+                                            <svg class="h-5 w-5 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span>In stock</span>
+                                        </p>
+                                        <div class="ml-4">
+                                            <a href="{% url 'products:remove_from_cart' pk=product.product.id %}">
+                                                <button type="button" class="text-sm font-medium text-green-600 hover:text-green-500">
+                                                    <span>Remove</span>
+                                                </button>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--</form>-->
+                            </li>
+                        </form>
+                        
+                        <!-- More products... -->
+                        {% endfor %}
+                            <div class="mt-10">
+                            <a href="{% url 'products:checkout' %}">
+                                <button type="submit" class="w-full rounded-md border border-transparent bg-green-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkout</button>
+                                </a>  
+                            </div>
+                            
+                            <div class="mt-6 text-center text-sm">
+                                <p>
+                                    or
+                                    <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500">
+                                        Continue Shopping
+                                        <span aria-hidden="true"> &rarr;</span>
+                                    </a>
+                                </p>
+                            </div>
+                            {% else %}
+                            <div class="border-b border-gray-200 pb-5 mt-10">
+                                <h3 class="text-lg font-medium leading-6 text-gray-900">Your cart is empty.
+                                    <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500 mt-3">
+                                        Continue Shopping
+                                    </a>
+                                </h3>
+                            </div>
+                            
+                            {% endif %}
+                        </ul>
+                    </section>
+                    
+                    
+                </div>
+            </div>
+            {% else %}
+            
+            <div class="bg-white">
+                <div class="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
+                    <h1 class="text-center text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Shopping Cart</h1>
+                    
+                    <form class="mt-12">
+                        <section aria-labelledby="cart-heading">
+                            <h2 id="cart-heading" class="sr-only">Items in your shopping cart</h2>
+                            
+                            <ul role="list" class="divide-y divide-gray-200 border-t border-b border-gray-200">
+                        
+                                {% if products %}
+                                {% for product in products %}
+                                <li class="flex py-6">
+                                    <div class="flex-shrink-0 bg-red-300">
+                                        {% with product.product_image.all|first as image%}
+                                        <img src="{{ image.url.url }}" alt="{{ image.alt_text }}" class="h-24 w-24 rounded-md object-cover object-center sm:h-32 sm:w-32">
+                                        {% endwith %}
+                                    </div>
+                                    
+                                    <div class="ml-4 flex flex-1 flex-col sm:ml-6">
+                                        <div>
+                                            <div class="flex justify-between">
+                                                <h4 class="text-sm">
+                                                    <a href="#" class="font-medium text-gray-700 hover:text-gray-800">{{product.name}}</a>
+                                                </h4>
+                                                <p class="ml-4 text-sm font-medium text-gray-900">${{product.price}}</p>
+                                            </div>
+                                            <!--attributes go here-->
+                                            <p class="mt-1 text-sm text-gray-500">Mint</p>
+                                            <p class="mt-1 text-sm text-gray-500">Medium</p>
+                                        </div>
+                                        
+                                        <div class="mt-4 flex flex-1 items-end justify-between">
+                                            <p class="flex items-center space-x-2 text-sm text-gray-700">
+                                                <!-- Heroicon name: mini/check -->
+                                                <svg class="h-5 w-5 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span>In stock</span>
+                                            </p>
+                                            
+                                            <div class="ml-4">
+                                                <a href="{% url 'products:remove_from_cart' pk=product.id %}">
+                                                    <button type="button" class="text-sm font-medium text-green-600 hover:text-green-500">
+                                                        <span>Remove</span>
+                                                    </button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                
+                                
+                                <!-- More products... -->
+                                {% endfor %}
+                                <div class="mt-10">
+                                    <a href="{% url 'products:checkout' %}">
+                                        <button type="submit" class="w-full rounded-md border border-transparent bg-green-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkouts</button>
+                                        </a>  
+                                    </div>
+                                    
+                                    <div class="mt-6 text-center text-sm">
+                                        <p>
+                                            or
+                                            <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500">
+                                                Continue Shopping
+                                                <span aria-hidden="true"> &rarr;</span>
+                                            </a>
+                                        </p>
+                                    </div>
+                                    {% else %}
+                                    <div class="border-b border-gray-200 pb-5 mt-10">
+                                        <h3 class="text-lg font-medium leading-6 text-gray-900">Your cart is empty.
+                                            <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500 mt-3">
+                                                Continue Shopping
+                                            </a>
+                                        </h3>
+                                    </div>
+                                    {% endif %}
+                                </ul>
+                            </section>
+                          
+                        </form>
+                    </div>
+                </div>
+                {% endif %}          
+{% endblock %}
+            
