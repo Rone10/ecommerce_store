@@ -6,6 +6,10 @@ from django.conf import settings
 #     def get_queryset(self):
 #         return super(ProductManager, self).get_queryset().filter(in_stock=True)
 
+"""
+category/department: shoes, clothes etc
+"""
+
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -54,6 +58,8 @@ class Attribute(models.Model):
     product = models.ForeignKey(
         "store.Product", related_name="attribute_name", on_delete=models.CASCADE
     )
+    # size = models.ForeignKey("app.Size", verbose_name=_(""), on_delete=models.CASCADE)
+    # color = models.ForeignKey("app.Color", verbose_name=_(""), on_delete=models.CASCADE)
 
     def __repr__(self):
         return f"{self.__class__.__name__}: {self.name}"
@@ -92,6 +98,9 @@ class OrderItem(models.Model):
     def total(self):
         return self.quantity * self.product.price
 
+    class Meta:
+        ordering = ["-created_at"]
+
 
 class Order(models.Model):
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -103,6 +112,9 @@ class Order(models.Model):
         for item in self.order_items.all():
             total += item.total()
         return total
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 # Create your models here.

@@ -23,5 +23,4 @@ urlpatterns = [
         views.OrdersListView.as_view(),
         name="orders",
     ),
-    # path("address/", AddressView.as_view(), name="address"),
 ]

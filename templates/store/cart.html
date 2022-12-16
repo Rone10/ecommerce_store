@@ -46,7 +46,7 @@
                                         </p>
                                         <div class="ml-4">
                                             <a href="{% url 'products:remove_from_cart' pk=product.product.id %}">
-                                                <button type="button" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                                <button type="button" class="text-sm font-medium text-green-600 hover:text-green-500">
                                                     <span>Remove</span>
                                                 </button>
                                             </a>
@@ -61,14 +61,14 @@
                         {% endfor %}
                             <div class="mt-10">
                             <a href="{% url 'products:checkout' %}">
-                                <button type="submit" class="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkout</button>
+                                <button type="submit" class="w-full rounded-md border border-transparent bg-green-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkout</button>
                                 </a>  
                             </div>
                             
                             <div class="mt-6 text-center text-sm">
                                 <p>
                                     or
-                                    <a href="{% url 'products:list' %}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                    <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500">
                                         Continue Shopping
                                         <span aria-hidden="true"> &rarr;</span>
                                     </a>
@@ -77,33 +77,16 @@
                             {% else %}
                             <div class="border-b border-gray-200 pb-5 mt-10">
                                 <h3 class="text-lg font-medium leading-6 text-gray-900">Your cart is empty.
-                                    <a href="{% url 'products:list' %}" class="font-medium text-indigo-600 hover:text-indigo-500 mt-3">
+                                    <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500 mt-3">
                                         Continue Shopping
                                     </a>
                                 </h3>
                             </div>
                             
                             {% endif %}
-                            {% comment %} {% endif %} {% endcomment %}
                         </ul>
                     </section>
                     
-                    <!-- Order summary -->
-                    <section aria-labelledby="summary-heading" class="mt-10">
-                        {% comment %} <h2 id="summary-heading" class="sr-only">Order summary</h2>
-                        
-                        <div>
-                            <dl class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <dt class="text-base font-medium text-gray-900">Subtotal</dt>
-                                    <dd class="ml-4 text-base font-medium text-gray-900">$96.00</dd>
-                                </div>
-                            </dl>
-                            <p class="mt-1 text-sm text-gray-500">Shipping and taxes will be calculated at checkout.</p>
-                        </div> {% endcomment %}
-                        
-                        
-                    </section>
                     
                 </div>
             </div>
@@ -118,9 +101,7 @@
                             <h2 id="cart-heading" class="sr-only">Items in your shopping cart</h2>
                             
                             <ul role="list" class="divide-y divide-gray-200 border-t border-b border-gray-200">
-                                {% comment %} {% if user.is_authenticated %}
-                                <h3>You are logged in, {{user.first_name}}</h3>
-                                {% else %} {% endcomment %}
+                        
                                 {% if products %}
                                 {% for product in products %}
                                 <li class="flex py-6">
@@ -154,7 +135,7 @@
                                             
                                             <div class="ml-4">
                                                 <a href="{% url 'products:remove_from_cart' pk=product.id %}">
-                                                    <button type="button" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                                    <button type="button" class="text-sm font-medium text-green-600 hover:text-green-500">
                                                         <span>Remove</span>
                                                     </button>
                                                 </a>
@@ -168,14 +149,14 @@
                                 {% endfor %}
                                 <div class="mt-10">
                                     <a href="{% url 'products:checkout' %}">
-                                        <button type="submit" class="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkouts</button>
+                                        <button type="submit" class="w-full rounded-md border border-transparent bg-green-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkouts</button>
                                         </a>  
                                     </div>
                                     
                                     <div class="mt-6 text-center text-sm">
                                         <p>
                                             or
-                                            <a href="{% url 'products:list' %}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                            <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500">
                                                 Continue Shopping
                                                 <span aria-hidden="true"> &rarr;</span>
                                             </a>
@@ -184,7 +165,7 @@
                                     {% else %}
                                     <div class="border-b border-gray-200 pb-5 mt-10">
                                         <h3 class="text-lg font-medium leading-6 text-gray-900">Your cart is empty.
-                                            <a href="{% url 'products:list' %}" class="font-medium text-indigo-600 hover:text-indigo-500 mt-3">
+                                            <a href="{% url 'products:list' %}" class="font-medium text-green-600 hover:text-green-500 mt-3">
                                                 Continue Shopping
                                             </a>
                                         </h3>
@@ -192,23 +173,7 @@
                                     {% endif %}
                                 </ul>
                             </section>
-                            
-                            <!-- Order summary -->
-                            <section aria-labelledby="summary-heading" class="mt-10">
-                                {% comment %} <h2 id="summary-heading" class="sr-only">Order summary</h2>
-                                
-                                <div>
-                                    <dl class="space-y-4">
-                                        <div class="flex items-center justify-between">
-                                            <dt class="text-base font-medium text-gray-900">Subtotal</dt>
-                                            <dd class="ml-4 text-base font-medium text-gray-900">$96.00</dd>
-                                        </div>
-                                    </dl>
-                                    <p class="mt-1 text-sm text-gray-500">Shipping and taxes will be calculated at checkout.</p>
-                                </div> {% endcomment %}
-                                
-                                
-                            </section>
+                          
                         </form>
                     </div>
                 </div>

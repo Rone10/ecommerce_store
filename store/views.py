@@ -59,9 +59,7 @@ class ProductListView(ListView):
         # Fetch the queryset from the parent get_queryset
         queryset = super().get_queryset()
         # Get the q GET parameter
-        q = self.request.GET.getlist(
-            "color[]"
-        )  # lookup how to return multiple input values
+        q = self.request.GET.getlist("category")
         print(q)
         if q:
             # Return a filtered queryset
