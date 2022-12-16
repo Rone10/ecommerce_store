@@ -311,18 +311,5 @@ class OrderDetailView(View):
         return render(request, "store/checkout_confirm.html", context)
 
 
-"""
-on product detail page, click add to cart and take product id and push it 
-onto a cart list in a session variable.
-
-When cart is clicked, grab the session varaible containing the cart items and 
-iterate over them and render them on the page by looking them up in the db.
-
-When user clicks checkout, grab cart items from session variable and create an order 
-item from the Orders model.
-
-
-"""
-
 # class ProductSearchListView(ListView):
 #     model = Product
