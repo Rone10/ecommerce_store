@@ -1,1 +1,2 @@
-# ecommerce_store
+# Ecommerce Store
+![home page](/screenshots/homepage.png)
