@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import index, MyLoginView, UserSignupView, AddressView
+from .views import (
+    index,
+    MyLoginView,
+    UserSignupView,
+    AddressView,
+)
 
 urlpatterns = [
     path("", index, name="home"),

@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ecommerce_store.settings")
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +29,12 @@ SECRET_KEY = "django-insecure-!hm$a^q@q62385lei0lwuvdql)fp)u22z8$knw9wo43#_yrs&q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "8073-198-16-154-153.ngrok.io",
+    "localhost",
+    "127.0.0.1",
+    "testserver",  # for testing in the terminal
+]
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -41,23 +49,25 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "core",
     "accounts",
     "store",
     # third party apps
     "tailwind",
     "theme",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
 
 ROOT_URLCONF = "ecommerce_store.urls"
 
@@ -143,3 +153,8 @@ LOGOUT_REDIRECT_URL = "accounts:login"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TAILWIND_APP_NAME = "theme"
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://8073-198-16-154-153.ngrok.io",
+]

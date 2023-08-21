@@ -20,11 +20,6 @@ class CustomLoginForm(AuthenticationForm):
         )
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for key, field in self.fields.items():
-            field.label = ""
-
 
 class UserCreateForm(UserCreationForm):
     first_name = forms.CharField(
@@ -42,11 +37,7 @@ class UserCreateForm(UserCreationForm):
             attrs={"class": "email", "placeholder": "Email", "id": "email"}
         )
     )
-    # username = forms.CharField(
-    #     widget=TextInput(
-    #         attrs={"class": "email", "id": "username", "placeholder": "Username"}
-    #     )
-    # )
+
     password1 = forms.CharField(
         widget=PasswordInput(
             attrs={"class": "email", "placeholder": "Password", "id": "password1"}
@@ -63,17 +54,11 @@ class UserCreateForm(UserCreationForm):
         )
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for key, field in self.fields.items():
-            field.label = ""
-
     class Meta:
         model = CustomUser
         fields = (
             "first_name",
             "last_name",
-            # "username",
             "email",
             "password1",
             "password2",
@@ -105,11 +90,6 @@ class AddressForm(forms.ModelForm):
             }
         )
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for key, field in self.fields.items():
-            field.label = ""
 
     class Meta:
         model = Address
