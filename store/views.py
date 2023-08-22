@@ -302,7 +302,6 @@ class CheckoutView(ListView):
 
 
 class OrderDetailView(View):
-
     # context_object_name = "order"
 
     def get(self, request, *args, **kwargs):
